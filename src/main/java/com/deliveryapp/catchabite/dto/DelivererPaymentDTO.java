@@ -1,5 +1,7 @@
 package com.deliveryapp.catchabite.dto;
 
+import java.math.BigDecimal;
+
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
@@ -25,10 +27,10 @@ public class DelivererPaymentDTO {
     // @NotNull 사용 여부 결정하기
     @NotNull
     @PositiveOrZero
-    private Long delivererPaymentMinimumFee;
+    private BigDecimal delivererPaymentMinimumFee;
     
     // Null 가능
     @PositiveOrZero
-    private Long delivererPaymentDistanceFee;
+    private BigDecimal delivererPaymentDistanceFee;
 
 }
