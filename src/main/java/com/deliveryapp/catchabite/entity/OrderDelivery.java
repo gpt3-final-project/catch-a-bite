@@ -45,7 +45,7 @@ public class OrderDelivery {
     // 배정 전에는 NULL 가능 -> Not Null로 설정함
     // deliverer_id는 deliverer.getDelivererId()로 꺼낸다.
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "deliverer_id", nullable = false)
+    @JoinColumn(name = "deliverer_id", nullable = true)
     private Deliverer deliverer;
 
     // 배달 대행 수락한 시간
