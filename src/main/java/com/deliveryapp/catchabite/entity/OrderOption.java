@@ -1,6 +1,5 @@
 package com.deliveryapp.catchabite.entity;
 
-import java.math.BigDecimal;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,6 +38,6 @@ public class OrderOption {
     @Column(name = "order_option_name", length = 100, nullable = false)
     private String orderOptionName;
 
-    @Column(name = "order_option_extra_price", precision = 19, scale = 2)
-    private BigDecimal orderOptionExtraPrice;
+    @Column(name = "order_option_extra_price")
+    private Long orderOptionExtraPrice;
 }
