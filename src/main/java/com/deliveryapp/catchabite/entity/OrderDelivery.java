@@ -1,9 +1,6 @@
 package com.deliveryapp.catchabite.entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
-import com.deliveryapp.catchabite.domain.enumtype.DeliveryStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,9 +10,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -25,7 +22,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "order_delivery")
+@Table(name = "order_delivery",
+       indexes = {
+           @Index(name = "idx_order_delivery_order_id", columnList = "order_id"),
+           @Index(name = "idx_order_delivery_deliverer_id", columnList = "deliverer_id")
+       })
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,19 +36,17 @@ public class OrderDelivery {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "delivery_id")
-    private Long deliveryId;
+    private Long id;
 
-    // store_order테이블의 PK를 FK로 가져옴
-    // order_id는 storeOrder.getStoreOrderID()로 꺼냄
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "order_id", nullable = false, unique = true)
-    private StoreOrder storeOrder;
+    // "ORDER"(order_id) FK였지만, 여기서는 일단 orderId만 유지 (엔티티 의존 제거)
+    @Column(name = "order_id", nullable = false)
+    private Long orderId;
 
     // 배정 전에는 NULL 가능
-    // deliverer_id는 deliverer.getDelivererId()로 꺼낸다.
-    // 한 배달기사는 여러 배달을 수행할 수 있음 (M:1)
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "deliverer_id", nullable = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "deliverer_id"
+    )
     private Deliverer deliverer;
 
     // 배달 대행 수락한 시간
@@ -56,40 +55,39 @@ public class OrderDelivery {
 
     // 가게에서 픽업 시간
     @Column(name = "order_delivery_pickup_time")
-    private LocalDateTime orderDeliveryPickupTime;
+    private LocalDateTime pickupTime;
 
     // 배달 시작/완료 시간
     @Column(name = "order_delivery_start_time")
-    private LocalDateTime orderDeliveryStartTime;
+    private LocalDateTime startTime;
 
     @Column(name = "order_delivery_complete_time")
-    private LocalDateTime orderDeliveryCompleteTime;
+    private LocalDateTime completeTime;
 
     // 거리/시간(분)
-    @Column(name = "order_delivery_distance", precision = 10, scale = 2)
-    private BigDecimal orderDeliveryDistance;
+    @Column(name = "order_delivery_distance")
+    private Integer distanceKm;
 
     @Column(name = "order_delivery_est_time")
-    private Integer orderDeliveryEstTime;
+    private Integer estimatedMinutes;
 
     @Column(name = "order_delivery_act_time")
-    private Integer orderDeliveryActTime;
+    private Integer actualMinutes;
 
-    // 주문 배송 상태
     @Enumerated(EnumType.STRING)
-    @Column(name = "order_delivery_status", length = 20)
-    private DeliveryStatus orderDeliveryStatus;
+    @Column(name = "order_delivery_status", length = 20, nullable = false)
+    private DeliveryStatus status;
 
-    // 배차(배달) 요청이 음식점에서 배달원에게 날라간 시간
-    @Column(name = "order_delivery_created_date")
-    private LocalDateTime orderDeliveryCreatedDate;
+    @Column(name = "order_delivery_created_date", nullable = false)
+    private LocalDateTime createdDate;
 
     @PrePersist
     void prePersist() {
-        //  주문 배송 상태는 입력된 값이 없으면, 기본값을 대기(PENDING)으로 할당함.
-        if (orderDeliveryStatus == null) orderDeliveryStatus = DeliveryStatus.PENDING;
-        // 배달기사에게 배달 요청을 보낸 시간이 없으면, 기본값을 현재시간으로 설정함.
-        if (orderDeliveryCreatedDate == null) orderDeliveryCreatedDate = LocalDateTime.now();
+        if (status == null) status = DeliveryStatus.PENDING;
+        if (createdDate == null) createdDate = LocalDateTime.now();
     }
 
+    public enum DeliveryStatus {
+        PENDING, ASSIGNED, PICKED_UP, IN_DELIVERY, DELIVERED, CANCELLED
+    }
 }

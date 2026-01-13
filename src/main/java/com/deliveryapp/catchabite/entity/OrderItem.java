@@ -1,5 +1,6 @@
 package com.deliveryapp.catchabite.entity;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -10,6 +11,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -21,7 +23,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "order_item")
+@Table(
+        name = "order_item",
+        indexes = {
+                @Index(name = "idx_order_item_order_id", columnList = "order_id")
+        }
+)
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -34,9 +41,11 @@ public class OrderItem {
     private Long orderItemId;
 
     // ERD: ORDER_ID (NN)
-    // order_id는 storeOrder.getStoreOrderID()로 꺼냄
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "order_id", nullable = false)
+    @JoinColumn(
+            name = "order_id",
+            nullable = false
+    )
     private StoreOrder storeOrder;
 
     // ERD: ORDER_ITEM_NAME varchar2(100) (NN)
@@ -45,24 +54,26 @@ public class OrderItem {
 
     // ERD: ORDER_ITEM_PRICE (NN)
     @Column(name = "order_item_price", nullable = false, precision = 19, scale = 2)
-    private Long orderItemPrice;
+    private BigDecimal orderItemPrice;
 
     // ERD: ORDER_ITEM_QUANTITY (NN)
     @Column(name = "order_item_quantity", nullable = false)
-    private Long orderItemQuantity;
+    private Integer orderItemQuantity;
 
-    @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "orderItem",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     @Builder.Default
     private List<OrderOption> orderOptions = new ArrayList<>();
 
     /** 연관관계 편의 메서드 */
-    // 주문 추가 메서드
     public void addOrderOption(OrderOption option) {
         orderOptions.add(option);
         option.setOrderItem(this);
     }
 
-    // 주문 삭제 메서드
     public void removeOrderOption(OrderOption option) {
         orderOptions.remove(option);
         option.setOrderItem(null);

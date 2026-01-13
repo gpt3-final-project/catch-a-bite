@@ -15,22 +15,14 @@ import com.deliveryapp.catchabite.domain.enumtype.StoreOpenStatus;
 @AllArgsConstructor
 @Builder
 @ToString(exclude = {
-        "storeOwner", "images", "menuCategories", "menus"
+        "images", "menuCategories", "menus"
 })
-public class StoreOrder {
+public class Store {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "STORE_ID")
     private Long storeId;
-
-    /**
-     * store와 owner 연결 (nullable)
-     * alter table store add column store_owner_id bigint null;
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_owner_id") // NULL 허용
-    private StoreOwner storeOwner;
 
     @Column(name = "STORE_OWNER_NAME", nullable = false, length = 100)
     private String storeOwnerName;
@@ -71,8 +63,10 @@ public class StoreOrder {
     @Column(name = "STORE_RECENT_ORDER")
     private Integer storeRecentOrder;
 
+  
     // 영업 상태
     // OPEN / CLOSE
+    
     @Enumerated(EnumType.STRING)
     @Column(name = "STORE_OPEN_STATUS", length = 10)
     private StoreOpenStatus storeOpenStatus;
@@ -80,15 +74,20 @@ public class StoreOrder {
     @Column(name = "STORE_INTRO", length = 4000)
     private String storeIntro;
 
+  
     // 비즈니스 메서드
-
+     
+   
     // 가게 기본 정보 변경
+     
     public void changeInfo(String name, String phone) {
         this.storeName = name;
         this.storePhone = phone;
     }
 
+
     // 가게 영업 상태 변경
+
     public void changeStatus(StoreOpenStatus status) {
         this.storeOpenStatus = status;
     }
@@ -100,7 +99,11 @@ public class StoreOrder {
         this.storeIntro = dto.getStoreIntro();
     }
 
+    
+
+  
     // 연관관계
+     
 
     @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
     @Builder.Default
