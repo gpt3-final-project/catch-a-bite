@@ -1,5 +1,7 @@
 package com.deliveryapp.catchabite.dto;
 
+import java.math.BigDecimal;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -28,8 +30,9 @@ public class OrderOptionDTO {
     private String orderOptionName;
 
     // 기본값을 0으로 설정, 컬럼이 0또는 0이상의 값만 가지도록 설정
+    // 후일 소수접 가격으로 확장시키기위새 사용.
     @Builder.Default
     @PositiveOrZero
-    private Long orderOptionExtraPrice = 0L;
+    private BigDecimal orderOptionExtraPrice = BigDecimal.ZERO;
     
 }

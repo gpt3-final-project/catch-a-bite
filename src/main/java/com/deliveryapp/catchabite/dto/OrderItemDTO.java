@@ -1,6 +1,7 @@
 package com.deliveryapp.catchabite.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -38,4 +39,7 @@ public class OrderItemDTO {
     @Positive
     private Integer orderItemQuantity;
     
+    // 주문 품목 목록
+    private List<OrderOptionDTO> orderOptions;
+
 }
