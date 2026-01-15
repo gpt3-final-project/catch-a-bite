@@ -51,13 +51,15 @@ public class StoreOrder {
     @Column(name = "ORDER_DATE")
     private LocalDateTime orderDate;
 
-    @OneToOne(mappedBy = "storeOrder", fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "storeOrder", fetch = FetchType.LAZY)
     private Payment payment;
 
     // @OneToOne(mappedBy = "storeOrder", fetch = FetchType.LAZY)
     // private Review review;
 
-    @OneToOne(mappedBy = "storeOrder", fetch = FetchType.EAGER)
+
+    @OneToOne(mappedBy = "storeOrder", fetch = FetchType.LAZY)
+
     private OrderDelivery orderDelivery;
 
     @OneToMany(mappedBy = "storeOrder", cascade=CascadeType.ALL)

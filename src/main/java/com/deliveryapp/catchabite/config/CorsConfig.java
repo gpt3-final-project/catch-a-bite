@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 /**
  * CorsConfig: React(프론트) ↔ Spring Boot(백엔드) 간 CORS 정책을 전역으로 정의
  *
@@ -20,6 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  * - allowCredentials(true)인 경우 allowedOrigins에 "*" 사용 불가 → 반드시 명시 Origin을 넣어야 함.
  */
 @Configuration
+
 public class CorsConfig {
 
     @Bean
@@ -29,8 +29,17 @@ public class CorsConfig {
         // ===== 허용 Origin 설정 =====
         // React 개발 서버 주소
         config.setAllowedOrigins(List.of(
-            "http://localhost:3000"
+            "http://localhost:3000",      // React dev server
+            "http://localhost",         // Spring Boot (for Postman local testing)
+            "http://localhost:80",      // Spring Boot (for Postman local testing)
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1",
+            "http://127.0.0.1:80"
         ));
+
+         // Debug log
+        log.info("✅ CORS Configuration loaded with allowed origins: {}", 
+                 config.getAllowedOrigins());
 
         // ===== 인증 정보 포함 여부 =====
         // 쿠키(JSESSIONID) 기반 인증/세션을 쓸 경우 true가 필요할 수 있음.
