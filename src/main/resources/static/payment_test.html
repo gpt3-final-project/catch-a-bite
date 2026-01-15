@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CatchABite Payment - PortOne V2 KG Inicis</title>
     <!-- PortOne V2 SDK -->
-    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+    <script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
+    <script>
+        console.log('IMP loaded?', window.IMP);
+    </script>
     <style>
         * {
             margin: 0;
@@ -344,34 +347,27 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>Order ID</label>
-                    <input type="number" id="orderId" placeholder="e.g., 2" min="1" required autofocus>
-                </div>
-                <div class="form-group">
-                    <label>Action</label>
-                    <button type="button" class="btn-secondary" onclick="fetchOrderData()" 
-                            style="padding: 12px 16px; margin-top: 24px; width: 100%;">
-                        Load Order
-                    </button>
+                    <input type="number" id="orderId" placeholder="e.g., 2" min="1" required autofocus readonly>
                 </div>
             </div>
 
             <!-- Step 2: 로드된 주문 정보 표시 -->
             <div class="order-section" id="orderSection" style="display: none;">
-                <h3>✅ Order Information Loaded</h3>
+                <h3>주문</h3>
                 
                 <div class="order-details">
                     <div class="detail-item">
-                        <div class="detail-label">USER ID</div>
+                        <div class="detail-label">ID</div>
                         <div class="detail-value" id="displayAppUserId">-</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">AMOUNT</div>
+                        <div class="detail-label">원</div>
                         <div class="detail-value highlight" id="displayAmount">-</div>
                     </div>
                 </div>
 
                 <div style="margin-top: 12px; padding: 12px; background: white; border-radius: 6px;">
-                    <div style="font-size: 12px; color: #666; font-weight: 500;">BUYER INFO</div>
+                    <div style="font-size: 12px; color: #666; font-weight: 500;">사용자 정보</div>
                     <div style="font-size: 13px; color: #333; margin-top: 6px;">
                         <div id="displayBuyerName">-</div>
                         <div id="displayBuyerEmail" style="color: #999; font-size: 12px; margin-top: 4px;">-</div>
@@ -461,11 +457,11 @@
                 }
                 hiddenInput.value = storeId;
                 
-                console.log('✅ Store ID loaded:', storeId);
+                console.log('Store ID loaded:', storeId);
                 return storeId;
                 
             } catch (error) {
-                console.error('❌ Store ID 로드 실패:', error.message);
+                console.error('Store ID 로드 실패:', error.message);
                 showError('Store ID Load Failed', error.message);
                 return null;
             }
@@ -486,7 +482,7 @@
             clearResult();
 
             try {
-                console.log('📱 Fetching order data for Order ID:', orderId);
+                console.log('주문내역 Order_Id: ', orderId);
                 
                 const response = await fetch(`/api/orders/${orderId}`);
                 
@@ -497,7 +493,7 @@
                 const data = await response.json();
                 orderData = data;
                 
-                console.log('✅ Order data loaded:', data);
+                console.log('Order data loaded:', data);
 
                 const appUserId = data.appUserId || data.app_user_id || 'N/A';
                 const amount = data.totalPrice || data.total_price || 0;
@@ -525,7 +521,7 @@
             } catch (error) {
                 showLoading(false);
                 showError('Failed to Load Order', error.message);
-                console.error('❌ Error fetching order:', error);
+                console.error('Error fetching order:', error);
                 
                 document.getElementById('orderSection').style.display = 'none';
                 document.getElementById('paymentMethodGroup').style.display = 'none';
@@ -592,23 +588,26 @@
                 console.log('🏪 Step 2: PortOne V2 결제 창 열기...');
 
                 // Step 2: PortOne 팝업 열기
-                const { IMP } = window;
-                IMP.init(storeId);
+                const cfgResp = await fetch('/api/config/portone');
+                const { storeId, channelKey } = await cfgResp.json();
+                // 40글자 이하 
+                const paymentId = `p${orderId}_${Date.now()}`; // ex: p2_1768442100000 
 
-                IMP.request_pay({
-                    pg: 'inicis',
-                    pay_method: paymentMethod,
-                    merchant_uid: merchantUid,
-                    name: `CatchABite Order #${orderId}`,
-                    amount: parseInt(amount),
-                    buyer_email: buyerEmail,
-                    buyer_name: buyerName,
-                    buyer_tel: buyerTel,
-                    buyer_addr: buyerAddr
-                }, function(rsp) {
-                    // Step 3: 결제 완료 후 처리 (V2 변경사항 적용)
-                    handlePaymentResponse(rsp, merchantUid);
+                const paymentResponse = await window.PortOne.requestPayment({
+                storeId,
+                channelKey,
+                paymentId: "paymentId",
+                orderName: `CatchABite Order #${orderId}`,
+                totalAmount: parseInt(amount),
+                currency: "CURRENCY_KRW",
+                payMethod: "CARD",
+                customer: {
+                    fullName: buyerName,
+                    phoneNumber: buyerTel,
+                    email: buyerEmail,
+                },
                 });
+                console.log('PortOne V2 response:', paymentResponse);
 
             } catch (error) {
                 showLoading(false);

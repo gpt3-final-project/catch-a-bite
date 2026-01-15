@@ -14,9 +14,20 @@ public class ConfigController {
     
     @Value("${portone.store-id}")
     private String storeId;
-    
+
+    @Value("${portone.channelKey}")
+    private String channelKey;
+
+    @GetMapping("/config/portone")
+    public ResponseEntity<?> getPortOneConfig() {
+        return ResponseEntity.ok(Map.of(
+            "storeId", storeId,
+            "channelKey", channelKey
+        ));
+    }
+
     @GetMapping("/config/store-id")
-    public ResponseEntity<?> getStoreId() {
+    public ResponseEntity<?> getPortOneStoreId() {
         return ResponseEntity.ok(Map.of(
             "storeId", storeId
         ));
