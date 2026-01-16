@@ -61,6 +61,20 @@ public class GlobalExceptionHandler {
             .body(ApiResponse.fail("INTERNAL_ERROR", resolveMessage(e, "Internal error")));
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalState(
+        IllegalStateException e,
+        HttpServletRequest request
+    ) throws Exception {
+        if (!isApiRequest(request)) {
+            throw e;
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(ApiResponse.fail("UNAUTHORIZED", resolveMessage(e, "Unauthorized")));
+    }
+
     private boolean isApiRequest(HttpServletRequest request) {
         String uri = request.getRequestURI();
         return uri != null && uri.startsWith("/api/");
