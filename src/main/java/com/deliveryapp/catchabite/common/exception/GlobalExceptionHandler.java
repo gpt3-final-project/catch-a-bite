@@ -60,6 +60,19 @@ public class GlobalExceptionHandler {
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(ApiResponse.fail("INTERNAL_ERROR", resolveMessage(e, "Internal error")));
     }
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalState(
+        IllegalStateException e,
+        HttpServletRequest request
+    ) throws Exception {
+        if (!isApiRequest(request)) {
+            throw e;
+        }
+
+    return ResponseEntity
+        .status(HttpStatus.UNAUTHORIZED)
+        .body(ApiResponse.fail("UNAUTHORIZED", resolveMessage(e, "Unauthorized")));
+}
 
     private boolean isApiRequest(HttpServletRequest request) {
         String uri = request.getRequestURI();
@@ -70,4 +83,5 @@ public class GlobalExceptionHandler {
         String message = e.getMessage();
         return (message == null || message.isBlank()) ? fallback : message;
     }
+    
 }

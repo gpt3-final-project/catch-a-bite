@@ -4,6 +4,7 @@ import com.deliveryapp.catchabite.domain.enumtype.StoreOpenStatus;
 import com.deliveryapp.catchabite.dto.StoreDTO;
 import com.deliveryapp.catchabite.dto.StorePatchRequestDTO;
 import com.deliveryapp.catchabite.dto.StoreStatusChangeRequestDTO;
+import com.deliveryapp.catchabite.dto.StoreSummaryDTO;
 import com.deliveryapp.catchabite.entity.Store;
 import com.deliveryapp.catchabite.entity.StoreOwner;
 import com.deliveryapp.catchabite.repository.StoreOwnerRepository;
@@ -11,6 +12,8 @@ import com.deliveryapp.catchabite.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -85,7 +88,6 @@ public class StoreServiceImpl implements StoreService {
 		Store store = storeRepository.findByStoreIdAndStoreOwner_StoreOwnerId(storeId, storeOwnerId)
 				.orElseThrow(() -> new IllegalArgumentException("내 매장이 아닙니다. storeId=" + storeId));
 
-
 		// PUT은 "전체 수정"으로 취급합니다 (유효성 검증상 필수값을 모두 받는 계약)
 		store.changeStoreInfo(
 				dto.getStoreName(),
@@ -141,6 +143,24 @@ public class StoreServiceImpl implements StoreService {
 	@Override
 	public void changeStoreStatus(Long storeOwnerId, Long storeId, StoreStatusChangeRequestDTO req) {
 		changeStoreStatus(storeOwnerId, storeId, req.getStoreOpenStatus());
+	}
+
+	// ✅ 추가: 내 매장 목록(요약) 조회
+	@Override
+	@Transactional(readOnly = true)
+	public List<StoreSummaryDTO> getMyStores(Long storeOwnerId) {
+
+		List<Store> stores = storeRepository.findAllByStoreOwner_StoreOwnerId(storeOwnerId);
+
+		return stores.stream()
+				.map(s -> StoreSummaryDTO.builder()
+						.storeId(s.getStoreId())
+						.storeName(s.getStoreName())
+						.storeCategory(s.getStoreCategory())
+						.storeAddress(s.getStoreAddress())
+						.storeOpenStatus(s.getStoreOpenStatus())
+						.build())
+				.toList();
 	}
 
 }
