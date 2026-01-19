@@ -1,12 +1,12 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import OwnerMainPlaceholder from "../pages/OwnerMainPlaceholder.jsx";
-import RiderMainPlaceholder from "../pages/RiderMainPlaceholder.jsx";
 import RoleLoginPage from "../pages/RoleLoginPage.jsx";
 import RoleSelectPage from "../pages/RoleSelectPage.jsx";
 import SignupOwnerPage from "../pages/SignupOwnerPage.jsx";
 import SignupRiderPage from "../pages/SignupRiderPage.jsx";
 import SignupUserPage from "../pages/SignupUserPage.jsx";
-import UserMainPlaceholder from "../pages/UserMainPlaceholder.jsx";
+import OwnerMainPage from "../pages/owner/OwnerMainPage.jsx";
+import RiderMainPage from "../pages/rider/RiderMainPage.jsx";
+import UserMainPage from "../pages/user/UserMainPage.jsx";
 
 export default function AppRouter({ onAuthRefresh }) {
   return (
@@ -31,9 +31,13 @@ export default function AppRouter({ onAuthRefresh }) {
       <Route path="/owner/signup" element={<SignupOwnerPage />} />
       <Route path="/rider/signup" element={<SignupRiderPage />} />
 
-      <Route path="/user" element={<UserMainPlaceholder />} />
-      <Route path="/owner" element={<OwnerMainPlaceholder />} />
-      <Route path="/rider" element={<RiderMainPlaceholder />} />
+      <Route path="/user/main" element={<UserMainPage />} />
+      <Route path="/owner/main" element={<OwnerMainPage />} />
+      <Route path="/rider/main" element={<RiderMainPage />} />
+
+      <Route path="/user" element={<Navigate to="/user/main" replace />} />
+      <Route path="/owner" element={<Navigate to="/owner/main" replace />} />
+      <Route path="/rider" element={<Navigate to="/rider/main" replace />} />
 
       <Route path="*" element={<Navigate to="/select" replace />} />
     </Routes>
