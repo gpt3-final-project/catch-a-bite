@@ -9,7 +9,7 @@ import java.security.Principal;
 /**
  * Resolve the current store owner's id from the authenticated principal.
  *
- * <p>This keeps the Owner controllers aligned with the team's session-based auth style
+ * This keeps the Owner controllers aligned with the team's session-based auth style
  * (principal comes from the login session), instead of requiring a client-provided header.
  */
 @Component

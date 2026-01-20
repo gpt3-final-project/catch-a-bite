@@ -1,6 +1,7 @@
 package com.deliveryapp.catchabite.service;
 
 import com.deliveryapp.catchabite.dto.MenuCategoryDTO;
+import com.deliveryapp.catchabite.dto.MenuCategoryWithMenusDTO;
 
 import java.util.List;
 
@@ -13,4 +14,6 @@ public interface MenuCategoryService {
 	MenuCategoryDTO updateMenuCategory(Long storeOwnerId, Long storeId, Long menuCategoryId, MenuCategoryDTO dto);
 
 	void deleteMenuCategory(Long storeOwnerId, Long storeId, Long menuCategoryId);
+
+	List<MenuCategoryWithMenusDTO> getMenuBoardForUser(Long storeId);
 }

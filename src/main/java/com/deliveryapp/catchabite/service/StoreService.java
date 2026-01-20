@@ -1,9 +1,12 @@
 package com.deliveryapp.catchabite.service;
 
+import java.util.List;
+
 import com.deliveryapp.catchabite.domain.enumtype.StoreOpenStatus;
 import com.deliveryapp.catchabite.dto.StoreDTO;
 import com.deliveryapp.catchabite.dto.StorePatchRequestDTO;
 import com.deliveryapp.catchabite.dto.StoreStatusChangeRequestDTO;
+import com.deliveryapp.catchabite.dto.StoreSummaryDTO;
 
 public interface StoreService {
 
@@ -25,5 +28,20 @@ public interface StoreService {
 	 * 상태 변경 요청 DTO를 분리해 프론트/백 스펙이 흔들리지 않도록 합니다.
 	 */
 	void changeStoreStatus(Long storeOwnerId, Long storeId, StoreStatusChangeRequestDTO req);
+
+	/**
+	 * storeOwnerId를 사용하여 사업자의 가게 목록을 조회합니다.
+	 */
+	List<StoreSummaryDTO> getMyStores(Long storeOwnerId);
+
+	/**
+	 * 사용자가 가게명 또는 음식 분류를 타입하여 가게들을 검색할 수 있도록 합니다.
+	 */
+    List<StoreDTO> searchStores(String keyword);
+
+    /**
+	 * 음식 분류로 가게들을 검색할 수 있도록 합니다.
+	 */
+    List<StoreDTO> getStoresByCategory(String storeCategory);
 
 }

@@ -18,7 +18,7 @@ public class AppUserServiceImpl implements AppUserService {
 
     
     private final AppUserRepository appUserRepository;
-    private AppUserConverter appUserConverter;
+    private final AppUserConverter appUserConverter;
 
 
     //==========================================================
@@ -81,14 +81,13 @@ public class AppUserServiceImpl implements AppUserService {
         validateAppUserId(appUserId, "updateUser");
 
         //DTO 확인
+        log.info("=============================================");
         log.info("업데이트 전 DTO 상태: {}", dto.nullFieldsReport());
-        log.error("=============================================");
-        log.error("프론트엔드에서 받은 DTO에 문제가 있습니다.");
-        log.error("=============================================");
+        log.info("=============================================");
 
 
         // Id가 일치하는지 확인
-        if(appUserId.equals(dto.getAppUserId())){
+        if(!appUserId.equals(dto.getAppUserId())){
             log.error("=============================================");
             log.error("경로 ID({})와 DTO ID({})가 일치하지 않습니다.", appUserId, dto.getAppUserId());
             log.error("=============================================");
@@ -113,6 +112,11 @@ public class AppUserServiceImpl implements AppUserService {
             dto.getAppUserEmail(),
             dto.getAppUserMobile()
         );
+
+        log.info("=============================================");
+        log.info("업데이트 후 Entity");
+        log.info(appUser.toString());
+        log.info("=============================================");
 
         return appUserConverter.toDto(appUser);
     }

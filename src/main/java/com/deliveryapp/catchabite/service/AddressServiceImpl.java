@@ -87,7 +87,7 @@ public class AddressServiceImpl implements AddressService {
             .orElse(null);
 
         // 존재하지 않는 주소라면 오류 던짐
-        if(dto == null){
+        if(entity == null){
             log.error("=============================================");
             log.error("프론트엔드에서 받은 DTO가 null입니다.");
             log.error("=============================================");
@@ -110,6 +110,12 @@ public class AddressServiceImpl implements AddressService {
             dto.getAddressNickname(), 
             dto.getAddressEntranceMethod(), 
             dto.getAddressIsDefault());
+
+        // 변경된 DTO 확인
+        log.info("=============================================");
+        log.info("업데이트 후 Entity");
+        log.info(entity);
+        log.info("=============================================");
 
         return addressConverter.toDto(entity);        
     }

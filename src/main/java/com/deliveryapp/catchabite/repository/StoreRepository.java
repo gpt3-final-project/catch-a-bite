@@ -22,4 +22,14 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
      * 사업자(오너) 소유 여부만 빠르게 체크
      */
     boolean existsByStoreIdAndStoreOwner_StoreOwnerId(Long storeId, Long storeOwnerId);
+
+    /* 
+     * 사용자 - 가게 명 및 음식 분류로 검색
+     */ 
+    List<Store> findByStoreNameContainingIgnoreCaseOrStoreCategoryContainingIgnoreCase(String name, String category);
+
+    /* 
+     * 사용자 - 음식 분류로 검색
+     */
+    List<Store> findByStoreCategory(String category);
 }

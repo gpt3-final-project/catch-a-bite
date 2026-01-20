@@ -1,5 +1,8 @@
 package com.deliveryapp.catchabite.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,6 +25,11 @@ public class MenuCategory {
 
     @Column(name = "menu_category_name")
     private String menuCategoryName;
+
+    //사용자 화면에 필요한 가게>메뉴 목록>메뉴를 자세히 나누기 위하여 필요합니다.
+    @OneToMany(mappedBy = "menuCategory", fetch = FetchType.LAZY)
+    @Builder.Default // 빌더 사용 시 기본값 유지
+    private List<Menu> menus = new ArrayList<>();
 
     public void changeName(String menuCategoryName) {
     this.menuCategoryName = menuCategoryName;
