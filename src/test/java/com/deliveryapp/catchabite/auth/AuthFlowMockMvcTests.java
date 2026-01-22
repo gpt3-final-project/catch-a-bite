@@ -104,6 +104,7 @@ class AuthFlowMockMvcTests {
         Map<String, Object> payload = new HashMap<>();
         payload.put("loginKey", email);
         payload.put("password", password);
+        payload.put("accountType", "USER");
 
         mockMvc.perform(post("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -125,6 +126,7 @@ class AuthFlowMockMvcTests {
         Map<String, Object> payload = new HashMap<>();
         payload.put("loginKey", email);
         payload.put("password", "WrongPass1!");
+        payload.put("accountType", "USER");
 
         mockMvc.perform(post("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -237,6 +239,7 @@ class AuthFlowMockMvcTests {
         Map<String, Object> payload = new HashMap<>();
         payload.put("loginKey", email);
         payload.put("password", password);
+        payload.put("accountType", "USER");
 
         MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)

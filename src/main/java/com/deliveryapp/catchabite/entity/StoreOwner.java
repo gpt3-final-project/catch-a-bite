@@ -62,4 +62,11 @@ public class StoreOwner {
     public boolean isActive() {
         return "Y".equalsIgnoreCase(storeOwnerStatus);
     }
+
+    /**
+     * Update store owner password with encoded value.
+     */
+    public void changePassword(String encodedPassword) {
+        this.storeOwnerPassword = encodedPassword;
+    }
 }

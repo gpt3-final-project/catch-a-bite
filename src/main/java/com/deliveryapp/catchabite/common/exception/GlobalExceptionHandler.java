@@ -36,6 +36,22 @@ public class GlobalExceptionHandler {
             .body(ApiResponse.fail("INVALID_CREDENTIALS", resolveMessage(e, "Invalid credentials.")));
     }
 
+    @ExceptionHandler(AppException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAppException(AppException e, HttpServletRequest request)
+        throws Exception {
+        if (!isApiRequest(request)) {
+            throw e;
+        }
+
+        ErrorCode errorCode = e.getErrorCode();
+        HttpStatus status = resolveStatus(errorCode);
+        String message = resolveMessage(e, errorCode.getMessage());
+
+        return ResponseEntity
+            .status(status)
+            .body(ApiResponse.fail(errorCode.getCode(), message));
+    }
+
     @ExceptionHandler({
         IllegalArgumentException.class,
         MethodArgumentNotValidException.class,
@@ -127,5 +143,18 @@ public class GlobalExceptionHandler {
             return objectError.getDefaultMessage();
         }
         return null;
+    }
+
+    private HttpStatus resolveStatus(ErrorCode errorCode) {
+        if (errorCode == null) {
+            return HttpStatus.BAD_REQUEST;
+        }
+        return switch (errorCode) {
+            case DUPLICATE_LOGIN_ID, DUPLICATE_NICKNAME, DUPLICATE_MOBILE -> HttpStatus.CONFLICT;
+            case FORBIDDEN -> HttpStatus.FORBIDDEN;
+            case ACCOUNT_NOT_FOUND, RESOURCE_NOT_FOUND -> HttpStatus.NOT_FOUND;
+            case INVALID_REQUEST -> HttpStatus.BAD_REQUEST;
+            default -> HttpStatus.BAD_REQUEST;
+        };
     }
 }

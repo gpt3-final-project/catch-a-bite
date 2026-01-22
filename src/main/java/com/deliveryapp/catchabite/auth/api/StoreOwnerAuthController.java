@@ -1,5 +1,6 @@
 package com.deliveryapp.catchabite.auth.api;
 
+import com.deliveryapp.catchabite.auth.AuthUser;
 import com.deliveryapp.catchabite.auth.api.dto.ExistsResponse;
 import com.deliveryapp.catchabite.auth.api.dto.StoreOwnerLoginRequest;
 import com.deliveryapp.catchabite.auth.api.dto.StoreOwnerLoginResponse;
@@ -114,8 +115,9 @@ public class StoreOwnerAuthController {
             RoleConstant.ROLE_STORE_OWNER
         );
 
+        AuthUser principal = new AuthUser("OWNER", request.email());
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-            "OWNER:" + request.email(),
+            principal,
             null,
             List.of(new SimpleGrantedAuthority(RoleNormalizer.normalize(RoleConstant.ROLE_STORE_OWNER)))
         );

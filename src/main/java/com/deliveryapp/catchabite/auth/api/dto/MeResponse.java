@@ -6,7 +6,9 @@ package com.deliveryapp.catchabite.auth.api.dto;
 public record MeResponse(
     Long userId,
     String loginKey,
+    String loginId,
     String name,
+    String nickname,
     String roleName,
     String mobile,
     String accountType

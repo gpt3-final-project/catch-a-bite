@@ -1,0 +1,20 @@
+package com.deliveryapp.catchabite.user.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+/**
+ * ChangePasswordRequest: payload for changing current user password.
+ */
+public record ChangePasswordRequest(
+    @NotBlank
+    String currentPassword,
+
+    @NotBlank
+    @Size(min = 8, max = 64)
+    String newPassword,
+
+    @NotBlank
+    String confirmNewPassword
+) {
+}

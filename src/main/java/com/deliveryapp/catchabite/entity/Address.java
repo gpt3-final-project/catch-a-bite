@@ -58,4 +58,28 @@ public class Address {
     @OneToMany(mappedBy = "address", cascade = CascadeType.ALL)
     @Builder.Default
     private List<StoreOrder> orders = new ArrayList<>();
+
+    public boolean isDefault() {
+        return "Y".equalsIgnoreCase(addressIsDefault);
+    }
+
+    public void markDefault(boolean isDefault) {
+        this.addressIsDefault = isDefault ? "Y" : "N";
+    }
+
+    public void markVisible(boolean visible) {
+        this.addressVisible = visible ? "Y" : "N";
+    }
+
+    public void updateDetails(String detail, String nickname, String entranceMethod) {
+        if (detail != null) {
+            this.addressDetail = detail;
+        }
+        if (nickname != null) {
+            this.addressNickname = nickname;
+        }
+        if (entranceMethod != null) {
+            this.addressEntranceMethod = entranceMethod;
+        }
+    }
 }

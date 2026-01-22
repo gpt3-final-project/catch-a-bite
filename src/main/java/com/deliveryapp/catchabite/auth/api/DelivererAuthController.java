@@ -1,5 +1,6 @@
 package com.deliveryapp.catchabite.auth.api;
 
+import com.deliveryapp.catchabite.auth.AuthUser;
 import com.deliveryapp.catchabite.auth.api.dto.DelivererLoginRequest;
 import com.deliveryapp.catchabite.auth.api.dto.DelivererSignUpRequest;
 import com.deliveryapp.catchabite.auth.api.dto.ExistsResponse;
@@ -96,8 +97,9 @@ public class DelivererAuthController {
             throw new InvalidCredentialsException("Invalid credentials.");
         }
 
+        AuthUser principal = new AuthUser("RIDER", request.email());
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-            "RIDER:" + request.email(),
+            principal,
             null,
             List.of(new SimpleGrantedAuthority(RoleNormalizer.normalize(RoleConstant.ROLE_RIDER)))
         );

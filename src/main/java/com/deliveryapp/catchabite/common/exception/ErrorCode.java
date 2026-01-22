@@ -10,6 +10,7 @@ public enum ErrorCode {
     DUPLICATE_LOGIN_ID("DUPLICATE_LOGIN_ID", "duplicate login id"),
     DUPLICATE_NICKNAME("DUPLICATE_NICKNAME", "duplicate nickname"),
     DUPLICATE_MOBILE("DUPLICATE_MOBILE", "duplicate mobile"),
+    RESOURCE_NOT_FOUND("RESOURCE_NOT_FOUND", "resource not found"),
     ACCOUNT_NOT_FOUND("ACCOUNT_NOT_FOUND", "account not found"),
     ACCOUNT_SUSPENDED("ACCOUNT_SUSPENDED", "account suspended"),
     ACCOUNT_WITHDRAWN("ACCOUNT_WITHDRAWN", "account withdrawn"),

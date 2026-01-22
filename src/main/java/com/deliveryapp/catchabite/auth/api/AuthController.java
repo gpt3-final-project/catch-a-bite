@@ -1,5 +1,6 @@
 package com.deliveryapp.catchabite.auth.api;
 
+import com.deliveryapp.catchabite.auth.AuthUser;
 import com.deliveryapp.catchabite.auth.api.dto.ExistsResponse;
 import com.deliveryapp.catchabite.auth.api.dto.LoginRequest;
 import com.deliveryapp.catchabite.auth.api.dto.LoginResponse;
@@ -50,10 +51,10 @@ public class AuthController {
         String accountType = request.accountType().trim().toUpperCase();
         String loginKey = request.loginKey().trim();
 
-        // ✅ SecurityContext에 인증 저장 + 세션 저장(=JSESSIONID 내려가게 함)
+        // Store authentication in session-backed SecurityContext.
+        AuthUser principal = new AuthUser(accountType, loginKey);
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-            // principal은 "ACCOUNT_TYPE:LOGIN_KEY" 형태로 저장
-            accountType + ":" + loginKey,
+            principal,
             null,
             List.of(new SimpleGrantedAuthority(RoleNormalizer.normalize(response.roleName())))
         );

@@ -189,7 +189,9 @@ public class AuthServiceImpl implements AuthService {
             return new MeResponse(
                 appUser.getAppUserId(),
                 loginKey,
+                appUser.getAppUserEmail(),
                 appUser.getAppUserName(),
+                appUser.getAppUserNickname(),
                 roleName != null ? roleName : RoleConstant.ROLE_USER,
                 appUser.getAppUserMobile(),
                 accountType
@@ -203,7 +205,9 @@ public class AuthServiceImpl implements AuthService {
             return new MeResponse(
                 storeOwner.getStoreOwnerId(),
                 loginKey,
+                storeOwner.getStoreOwnerEmail(),
                 storeOwner.getStoreOwnerName(),
+                null,
                 roleName != null ? roleName : RoleConstant.ROLE_STORE_OWNER,
                 storeOwner.getStoreOwnerMobile(),
                 accountType
@@ -217,7 +221,9 @@ public class AuthServiceImpl implements AuthService {
             return new MeResponse(
                 deliverer.getDelivererId(),
                 loginKey,
+                deliverer.getDelivererEmail(),
                 loginKey,
+                null,
                 roleName != null ? roleName : RoleConstant.ROLE_RIDER,
                 null,
                 accountType

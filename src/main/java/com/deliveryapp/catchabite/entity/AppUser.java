@@ -83,4 +83,8 @@ public class AppUser {
     public void changePassword(String encodedPassword) {
         this.appUserPassword = encodedPassword;
     }
+
+    public void changeNickname(String nickname) {
+        this.appUserNickname = nickname;
+    }
 }

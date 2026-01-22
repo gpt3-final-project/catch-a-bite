@@ -82,4 +82,10 @@ public class Deliverer {
         if (delivererCreatedDate == null) delivererCreatedDate = LocalDateTime.now(); // 생성일 자동
     }
 
+    /**
+     * Update deliverer password with encoded value.
+     */
+    public void changePassword(String encodedPassword) {
+        this.delivererPassword = encodedPassword;
+    }
 }
