@@ -1,12 +1,9 @@
 package com.deliveryapp.catchabite.service;
 
-import java.util.List;
-
 import com.deliveryapp.catchabite.domain.enumtype.StoreOpenStatus;
 import com.deliveryapp.catchabite.dto.StoreDTO;
 import com.deliveryapp.catchabite.dto.StorePatchRequestDTO;
 import com.deliveryapp.catchabite.dto.StoreStatusChangeRequestDTO;
-import com.deliveryapp.catchabite.dto.StoreSummaryDTO;
 
 public interface StoreService {
 

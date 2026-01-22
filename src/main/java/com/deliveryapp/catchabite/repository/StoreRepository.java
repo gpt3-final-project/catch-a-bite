@@ -1,9 +1,10 @@
 package com.deliveryapp.catchabite.repository;
 
+import com.deliveryapp.catchabite.domain.enumtype.StoreOpenStatus;
 import com.deliveryapp.catchabite.entity.Store;
+
+
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,8 +37,7 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     List<Store> findByStoreCategory(String category);
 
     /**
-     * 사용자 -  영업 중인 가게 중 랜덤으로 N개 조회
+     * 사용자 -  영업 중인 가게 조회
      */
-    @Query(value = "SELECT * FROM store s WHERE s.store_open_status = 'OPEN' ORDER BY RAND() LIMIT :limit", nativeQuery = true)
-    List<Store> findRandomStores(@Param("limit") int limit);
+    List<Store> findByStoreOpenStatus(StoreOpenStatus status);
 }

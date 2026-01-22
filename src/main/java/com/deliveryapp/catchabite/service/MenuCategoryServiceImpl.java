@@ -1,9 +1,6 @@
 package com.deliveryapp.catchabite.service;
 
-import com.deliveryapp.catchabite.converter.MenuConverter;
 import com.deliveryapp.catchabite.dto.MenuCategoryDTO;
-import com.deliveryapp.catchabite.dto.MenuCategoryWithMenusDTO;
-import com.deliveryapp.catchabite.dto.MenuDTO;
 import com.deliveryapp.catchabite.entity.MenuCategory;
 import com.deliveryapp.catchabite.entity.Store;
 import com.deliveryapp.catchabite.repository.MenuCategoryRepository;
@@ -21,7 +18,6 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
 
 	private final StoreRepository storeRepository;
 	private final MenuCategoryRepository menuCategoryRepository;
-	private final MenuConverter menuConverter;
 
 
 	@Override

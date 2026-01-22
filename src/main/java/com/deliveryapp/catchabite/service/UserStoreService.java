@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.deliveryapp.catchabite.dto.StoreDTO;
 import com.deliveryapp.catchabite.dto.StoreSummaryDTO;
+import com.deliveryapp.catchabite.dto.UserStoreResponseDTO;
 
 public interface UserStoreService {
     
@@ -17,5 +18,12 @@ public interface UserStoreService {
 	 */
     public List<StoreDTO> getStoresByCategory(String storeCategory);
 
-	public List<StoreSummaryDTO> getRandomStores(int limit);
+	public List<StoreSummaryDTO> getRandomStores();
+
+	/**
+     * Fetches store details, including images, rating, and categorized menus for the user view.
+     * @param storeId The ID of the store
+     * @return UserStoreResponseDTO containing all page data
+     */
+    UserStoreResponseDTO getStoreDetailsForUser(Long storeId, String userLoginId);
 }

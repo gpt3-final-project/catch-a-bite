@@ -3,18 +3,11 @@ package com.deliveryapp.catchabite.converter;
 import com.deliveryapp.catchabite.dto.StoreDTO;
 import com.deliveryapp.catchabite.dto.StoreSummaryDTO;
 import com.deliveryapp.catchabite.entity.Store;
-import com.deliveryapp.catchabite.repository.StoreRepository;
-
-import lombok.NoArgsConstructor;
 
 import org.springframework.stereotype.Component;
 
 @Component
-@NoArgsConstructor
 public class StoreConverter {
-
-    private StoreRepository storeRepository;
-
 
     public StoreDTO toDto(Store store) {
         if (store == null) return null;

@@ -10,4 +10,6 @@ public interface ReviewRepository extends JpaRepository<Review,Long> {
     //Review findByStore_StoreId(Long storeId, Pageable pageable)
 
     //Review findByReviewIdAndStore_StoreId(Long reviewId, Long storeId)
+
+    long countByStore_StoreId(Long storeId);
 }

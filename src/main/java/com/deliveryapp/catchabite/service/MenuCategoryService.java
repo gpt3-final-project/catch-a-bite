@@ -1,7 +1,6 @@
 package com.deliveryapp.catchabite.service;
 
 import com.deliveryapp.catchabite.dto.MenuCategoryDTO;
-import com.deliveryapp.catchabite.dto.MenuCategoryWithMenusDTO;
 
 import java.util.List;
 

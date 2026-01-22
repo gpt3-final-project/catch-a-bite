@@ -1,14 +1,25 @@
+/* catchabite/service/UserStoreServiceImpl.java */
 package com.deliveryapp.catchabite.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.deliveryapp.catchabite.converter.StoreConverter;
+import com.deliveryapp.catchabite.domain.enumtype.StoreOpenStatus;
+import com.deliveryapp.catchabite.dto.MenuCategoryWithMenusDTO;
+import com.deliveryapp.catchabite.dto.MenuDTO;
 import com.deliveryapp.catchabite.dto.StoreDTO;
 import com.deliveryapp.catchabite.dto.StoreSummaryDTO;
+import com.deliveryapp.catchabite.dto.UserStoreResponseDTO;
+import com.deliveryapp.catchabite.entity.AppUser;
+import com.deliveryapp.catchabite.entity.FavoriteStore;
 import com.deliveryapp.catchabite.entity.Store;
+import com.deliveryapp.catchabite.repository.AppUserRepository;
+import com.deliveryapp.catchabite.repository.FavoriteStoreRepository;
+import com.deliveryapp.catchabite.repository.ReviewRepository;
 import com.deliveryapp.catchabite.repository.StoreRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -19,38 +30,89 @@ import lombok.RequiredArgsConstructor;
 public class UserStoreServiceImpl implements UserStoreService {
 
     private final StoreRepository storeRepository;
-	private final StoreConverter storeConverter;
-
-    //사용자가 가게를 검색하는대 사용됨
-	@Override    
+    private final StoreConverter storeConverter;
+    private final ReviewRepository reviewRepository;
+    
+    // ✅ Added back these repositories for Favorite logic
+    private final FavoriteStoreRepository favoriteStoreRepository;
+    private final AppUserRepository appUserRepository;
+    
+    @Override    
     public List<StoreDTO> searchStores(String keyword) {
-        // StoreName과 StoreCategory를 키워드로 검색
         List<Store> stores = storeRepository.findByStoreNameContainingIgnoreCaseOrStoreCategoryContainingIgnoreCase(keyword, keyword);
-        
-        // storeConverter를 사용하여 엔티티를 DTO로 변환
-        return stores.stream()
-                .map(storeConverter::toDto)
-                .toList();
+        return stores.stream().map(storeConverter::toDto).toList();
     }
 
-	//가게를 store.storeCategory로 검색함.
     @Override
     public List<StoreDTO> getStoresByCategory(String storeCategory) {
-        // 특정 음식 카테고리로 매장 검색
         List<Store> stores = storeRepository.findByStoreCategory(storeCategory);
-        
-        // storeConverter를 사용하여 엔티티를 DTO로 변환
-        return stores.stream()
-                .map(storeConverter::toDto)
-                .toList();
+        return stores.stream().map(storeConverter::toDto).toList();
     }
 
     @Override
-    public List<StoreSummaryDTO> getRandomStores(int limit) {
-        List<Store> stores = storeRepository.findRandomStores(limit);
-        List<StoreSummaryDTO> storeSummaries = stores.stream()
+    public List<StoreSummaryDTO> getRandomStores() {
+        List<Store> allOpenStores = storeRepository.findByStoreOpenStatus(StoreOpenStatus.OPEN);
+        return allOpenStores.stream()
                 .map(storeConverter::toSummaryDTO)
-                .toList();
-        return storeSummaries;
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public UserStoreResponseDTO getStoreDetailsForUser(Long storeId, String userLoginId) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 가게id입니다."));
+
+        String storeImageUrl = null;
+        if (store.getImages() != null && !store.getImages().isEmpty()) {
+            storeImageUrl = store.getImages().get(0).getStoreImageUrl();
+        }
+
+        Integer reviewCount = (int) reviewRepository.countByStore_StoreId(storeId);
+
+        // ✅ This iteration is now SAFE from N+1 due to batch fetching config
+        List<MenuCategoryWithMenusDTO> categoryDTOs = store.getMenuCategories().stream()
+                .map(category -> MenuCategoryWithMenusDTO.builder()
+                        .menuCategoryId(category.getMenuCategoryId())
+                        .menuCategoryName(category.getMenuCategoryName())
+                        .menus(category.getMenus().stream()
+                                .map(menu -> MenuDTO.builder()
+                                        .menuId(menu.getMenuId())
+                                        .menuName(menu.getMenuName())
+                                        .menuPrice(menu.getMenuPrice())
+                                        .menuDescription(menu.getMenuDescription())
+                                        .menuIsAvailable(menu.getMenuIsAvailable())
+                                        .build())
+                                .collect(Collectors.toList()))
+                        .build())
+                .collect(Collectors.toList());
+
+        Long favoriteId = null;
+        if (userLoginId != null) {
+            AppUser appUser = appUserRepository.findByAppUserEmail(userLoginId).orElse(null);
+            
+            if (appUser != null) {
+                favoriteId = favoriteStoreRepository.findByAppUser_AppUserIdAndStore_StoreId(appUser.getAppUserId(), storeId)
+                        .map(FavoriteStore::getFavoriteId)
+                        .orElse(null);
+            }
+        }
+
+        return UserStoreResponseDTO.builder()
+                .storeId(store.getStoreId())
+                .storeName(store.getStoreName())
+                .storeImageUrl(storeImageUrl)
+                .rating(store.getStoreRating())
+                .reviewCount(reviewCount)
+                .storeIntro(store.getStoreIntro())
+                .storePhone(store.getStorePhone())
+                .storeAddress(store.getStoreAddress())
+                .storeCategory(store.getStoreCategory())
+                .storeOpenStatus(store.getStoreOpenStatus())
+                .minOrderPrice(store.getStoreMinOrder())
+                .deliveryFee(store.getStoreDeliveryFee())
+                .estimatedDeliveryTime("20-30분")
+                .menuCategories(categoryDTOs)
+                .favoriteId(favoriteId) 
+                .build();
     }
 }
