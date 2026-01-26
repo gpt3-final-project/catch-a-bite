@@ -2,6 +2,7 @@ package com.deliveryapp.catchabite.controller;
 
 import com.deliveryapp.catchabite.common.response.ApiResponse;
 import com.deliveryapp.catchabite.dto.StoreDTO;
+import com.deliveryapp.catchabite.dto.StoreDeliveryConditionPatchRequestDTO;
 import com.deliveryapp.catchabite.dto.StorePatchRequestDTO;
 import com.deliveryapp.catchabite.dto.StoreStatusChangeRequestDTO;
 import com.deliveryapp.catchabite.dto.StoreSummaryDTO;
@@ -77,6 +78,18 @@ public class OwnerStoreController {
 		Long storeOwnerId = ownerContext.requireStoreOwnerId(principal);
 
 		StoreDTO result = storeService.patchStoreBasicInfo(storeOwnerId, storeId, dto);
+		return ResponseEntity.ok(ApiResponse.ok(result));
+	}
+
+	// 배달조건 부분 수정 (P1)
+	@PatchMapping("/{storeId}/delivery-condition")
+	public ResponseEntity<ApiResponse<StoreDTO>> patchStoreDeliveryCondition(Principal principal,
+										@PathVariable Long storeId,
+										@RequestBody @Valid StoreDeliveryConditionPatchRequestDTO dto) {
+
+		Long storeOwnerId = ownerContext.requireStoreOwnerId(principal);
+
+		StoreDTO result = storeService.patchStoreDeliveryCondition(storeOwnerId, storeId, dto);
 		return ResponseEntity.ok(ApiResponse.ok(result));
 	}
 

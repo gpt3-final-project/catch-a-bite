@@ -2,6 +2,7 @@ package com.deliveryapp.catchabite.service;
 
 import com.deliveryapp.catchabite.domain.enumtype.StoreOpenStatus;
 import com.deliveryapp.catchabite.dto.StoreDTO;
+import com.deliveryapp.catchabite.dto.StoreDeliveryConditionPatchRequestDTO;
 import com.deliveryapp.catchabite.dto.StorePatchRequestDTO;
 import com.deliveryapp.catchabite.dto.StoreStatusChangeRequestDTO;
 import com.deliveryapp.catchabite.dto.StoreSummaryDTO;
@@ -21,6 +22,12 @@ public interface StoreService {
 	 * - null인 필드는 변경하지 않습니다.
 	 */
 	StoreDTO patchStoreBasicInfo(Long storeOwnerId, Long storeId, StorePatchRequestDTO dto);
+
+	/**
+	 * 배달조건 부분 수정용 (PATCH)
+	 * - null인 필드는 변경하지 않습니다.
+	 */
+	StoreDTO patchStoreDeliveryCondition(Long storeOwnerId, Long storeId, StoreDeliveryConditionPatchRequestDTO dto);
 
 	void changeStoreStatus(Long storeOwnerId, Long storeId, StoreOpenStatus status);
 
