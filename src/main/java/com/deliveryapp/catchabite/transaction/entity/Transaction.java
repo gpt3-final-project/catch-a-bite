@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  * relatedEntityId + relatedEntityType로 연결합니다.
  * 
  * Required Variables/Parameters:
- * - transactionType (TransactionType): 거래 종류 (USER_PAYMENT/STORE_PAYOUT/DELIVERY_PAYOUT)
+ * - transactionType (TransactionType): 거래 종류 (USERPAYMENT/STOREPAYOUT/DELIVERYPAYOUT)
  * - relatedEntityId (Long): 관련 엔티티 ID (예: 주문ID)
  * - relatedEntityType (String): 관련 엔티티 타입 문자열 (예: "ORDER")
  * - amount (Long): 거래 금액 (KRW)

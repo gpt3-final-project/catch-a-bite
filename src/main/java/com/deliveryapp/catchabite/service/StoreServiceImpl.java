@@ -11,6 +11,7 @@ import com.deliveryapp.catchabite.entity.StoreOwner;
 import com.deliveryapp.catchabite.repository.StoreOwnerRepository;
 import com.deliveryapp.catchabite.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +23,8 @@ import java.util.List;
 public class StoreServiceImpl implements StoreService {
 
 	private final StoreRepository storeRepository;
-	private final StoreOwnerRepository storeOwnerRepository; // 추가
+	private final StoreOwnerRepository storeOwnerRepository;
+
 
 	@Override
 	@Transactional(readOnly = true)

@@ -13,6 +13,8 @@ import java.util.Optional;
 
 public interface StoreOrderRepository extends JpaRepository<StoreOrder, Long> {
 
+    Optional<StoreOrder> findByOrderId(Long orderId);
+
     Optional<StoreOrder> findByOrderIdAndStore_StoreId(Long orderId, Long storeId);
 
     // ✅ 페이징 기본(상태/기간 없음)
