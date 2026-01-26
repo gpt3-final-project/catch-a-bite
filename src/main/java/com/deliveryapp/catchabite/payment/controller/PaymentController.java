@@ -97,7 +97,7 @@ public class PaymentController {
      * 3. merchant_uid 생성 (결제 고유 번호)
      * 4. PortOne 결제 창에 필요한 정보 반환
      * 
-     * ⚠️ 중요: 이 단계에서는 아직 실제 결제가 일어나지 않습니다.
+     * 중요: 이 단계에서는 아직 실제 결제가 일어나지 않습니다.
      * 결제 상태는 /complete 엔드포인트에서만 PAID로 업데이트됩니다.
      * 
      * Request Example (from payment_test.html):
@@ -243,7 +243,7 @@ public class PaymentController {
     
     @PostMapping("/complete")
     public ResponseEntity<?> completePayment(
-            @RequestParam Long paymentId,
+            @RequestParam String paymentId,
             @RequestParam String merchantUid) {
         
         try {
@@ -322,7 +322,7 @@ public class PaymentController {
                 PaymentCompleteResponseDTO.builder()
                 .success(true)
                 .message("결제가 성공적으로 완료되었습니다.")
-                .paymentId(payment.getPaymentId())
+                .paymentId(payment.getPortOnePaymentId())
                 .orderId(payment.getStoreOrder().getOrderId())
                 .paymentStatus(payment.getPaymentStatus())
                 .paymentAmount(payment.getPaymentAmount())
@@ -480,7 +480,7 @@ public class PaymentController {
                     PaymentCompleteResponseDTO.builder()
                     .success(true)
                     .message("결제 정보를 조회했습니다.")
-                    .paymentId(payment.getPaymentId())
+                    .paymentId(payment.getPortOnePaymentId())
                     .orderId(payment.getStoreOrder().getOrderId())
                     .paymentStatus(payment.getPaymentStatus())
                     .paymentAmount(payment.getPaymentAmount())

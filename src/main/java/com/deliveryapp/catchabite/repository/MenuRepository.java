@@ -22,4 +22,7 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
 
     // 매장 삭제/정리 시 메뉴 전체 삭제가 필요하면 사용(정책에 따라)
     void deleteAllByStore_StoreId(Long storeId);
+
+    // 사용자 전용 - 카테고리별 메뉴 조회
+    List<Menu> findByMenuCategory_MenuCategoryId(Long menuCategoryId);
 }

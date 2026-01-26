@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Value;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 public class ConfigController {
     
     @Value("${portone.store-id}")

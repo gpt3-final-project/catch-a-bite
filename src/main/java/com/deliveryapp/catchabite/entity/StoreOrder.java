@@ -26,10 +26,10 @@ public class StoreOrder {
     private Long orderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "app_user_id", nullable = false) // ERD shows nullable
+    @JoinColumn(name = "app_user_id", nullable = false)
     private AppUser appUser;
 
-    @ManyToOne(fetch = FetchType.LAZY) // ✅ EAGER -> LAZY 권장 (N+1 방지)
+    @ManyToOne(fetch = FetchType.LAZY) 
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 

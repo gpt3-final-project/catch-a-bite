@@ -10,6 +10,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,10 +24,13 @@ public class UserStoreOrderServiceImpl implements UserStoreOrderService {
     private final StoreRepository storeRepository;
     private final AddressRepository addressRepository;
     private final StoreOrderConverter storeOrderConverter;
+    
+    // [추가] 장바구니 데이터를 가져오기 위해 리포지토리 주입
+    private final CartRepository cartRepository;
 
 
     // =====================================================================
-    // CREATE
+    // CREATE (장바구니 기반 주문 생성)
     // =====================================================================
     @Override
     @Transactional
@@ -39,22 +43,94 @@ public class UserStoreOrderServiceImpl implements UserStoreOrderService {
         // 이외 정보는 프론트엔드에서 StoreOrderDTO 형식으로 받음.
         // =====================================================================
 
-        AppUser appUser = appUserRepository.findById(dto.getAppUserId())
-            .orElseThrow(() -> new IllegalArgumentException("StoreOrderService - appUser " + dto.getAppUserId() + "가 없음."));
-        Store store = storeRepository.findById(dto.getStoreId())
-            .orElseThrow(() -> new IllegalArgumentException("StoreOrderService - Store " + dto.getStoreId() + "가 없음."));
-        Address address = addressRepository.findById(dto.getAddressId())
-            .orElseThrow(() -> new IllegalArgumentException("StoreOrderService - Address " + dto.getAddressId() + "가 없음."));
 
-        // =====================================================================
-        // 작성한 dtoToEntity Class를 사용하여 Entity를 작성함.
-        // 그 후 .save 함수를 사용하여 order에 PK를 포함함.
-        // =====================================================================
-        StoreOrder order = storeOrderConverter.toEntity(dto, appUser, store, address);
-        StoreOrder result = storeOrderRepository.save(order);
+        log.info("=============================================");
+        log.info("주문 생성 요청: UserID={}, StoreID={}", dto.getAppUserId(), dto.getStoreId());
+        log.info("=============================================");
+
+        // 1. 기본 엔티티 조회 (User, Store, Address)
+        AppUser appUser = appUserRepository.findById(dto.getAppUserId())
+            .orElseThrow(() -> new IllegalArgumentException("UserStoreOrderServiceImpl - AppUserId를 찾을 수 없습니다. ID: " + dto.getAppUserId()));
         
-        log.info("StoreOrder: orderId={}", result.getOrderId());
-        return storeOrderConverter.toDto(result);
+        Store store = storeRepository.findById(dto.getStoreId())
+            .orElseThrow(() -> new IllegalArgumentException("UserStoreOrderServiceImpl - StoreId를 찾을 수 없습니다. ID: " + dto.getStoreId()));
+        
+        Address address = addressRepository.findById(dto.getAddressId())
+            .orElseThrow(() -> new IllegalArgumentException("UserStoreOrderServiceImpl - AddressId를 찾을 수 없습니다. ID: " + dto.getAddressId()));
+
+
+        // 2. 장바구니 조회 (User + Store 기준)
+        Cart cart = cartRepository.findByAppUser_AppUserIdAndStore_StoreId(dto.getAppUserId(), dto.getStoreId())
+            .orElseThrow(() -> new IllegalArgumentException("UserStoreOrderServiceImpl - 장바구니가 비어있거나 존재하지 않습니다."));
+
+        List<CartItem> cartItems = cart.getCartItems();
+        if (cartItems == null || cartItems.isEmpty()) {
+            throw new IllegalArgumentException("UserStoreOrderServiceImpl - 장바구니에 주문할 메뉴가 없습니다.");
+        }
+
+
+        // 3. 주문(StoreOrder) 객체 생성 (아직 저장 전)
+        // DTO에서 받은 기본 배송비 등을 포함, 초기 가격은 0원으로 설정 후 계산
+        StoreOrder storeOrder = StoreOrder.builder()
+                .appUser(appUser)
+                .store(store)
+                .address(address)
+                .orderAddressSnapshot(address.getAddressDetail()) // 주소 스냅샷 저장
+                .orderDeliveryFee(dto.getOrderDeliveryFee() != null ? dto.getOrderDeliveryFee() : 0L)
+                .orderTotalPrice(0L) // 아래에서 계산하여 업데이트
+                .build();
+
+
+        // 4. 장바구니 항목(CartItem) -> 주문 항목(OrderItem) 변환 및 총액 계산
+        long calculatedTotalPrice = 0L;
+        List<OrderItem> orderItems = new ArrayList<>();
+
+        for (CartItem cartItem : cartItems) {
+            Menu menu = cartItem.getMenu();
+            
+            // 메뉴 가격(Integer) -> Long 변환
+            long itemPrice = menu.getMenuPrice().longValue(); 
+            long quantity = cartItem.getCartItemQuantity().longValue();
+            long lineTotal = itemPrice * quantity;
+
+            // OrderItem 생성 (Snapshot)
+            OrderItem orderItem = OrderItem.builder()
+                    .storeOrder(storeOrder) // 연관관계 설정
+                    .orderItemName(menu.getMenuName())
+                    .orderItemPrice(itemPrice)
+                    .orderItemQuantity(quantity)
+                    .build();
+
+            orderItems.add(orderItem);
+            calculatedTotalPrice += lineTotal;
+        }
+
+        // 5. 주문 객체에 아이템 리스트 및 최종 가격 설정
+        storeOrder.getOrderItems().addAll(orderItems);
+
+        // 총 결제 금액 = 음식 총액 + 배달팁
+        long finalTotalPrice = calculatedTotalPrice + storeOrder.getOrderDeliveryFee();
+        
+        StoreOrder finalOrder = StoreOrder.builder()
+            .appUser(appUser)
+            .store(store)
+            .address(address)
+            .orderAddressSnapshot(address.getAddressDetail())
+            .orderDeliveryFee(storeOrder.getOrderDeliveryFee())
+            .orderStatus(com.deliveryapp.catchabite.domain.enumtype.OrderStatus.PENDING)
+            .orderDate(java.time.LocalDateTime.now())
+            .orderTotalPrice(finalTotalPrice)
+            .orderItems(orderItems)
+            .build();
+
+        // 6. DB 저장 (Cascade.ALL로 인해 OrderItem들도 같이 저장됨)
+        StoreOrder savedOrder = storeOrderRepository.save(finalOrder);
+
+        // 7. 주문 완료 후 장바구니 비우기
+        cartRepository.delete(cart);
+        log.info("주문 완료 및 장바구니 삭제됨: OrderID={}", savedOrder.getOrderId());
+
+        return storeOrderConverter.toDto(savedOrder);
     }
 
     // =====================================================================
@@ -86,12 +162,11 @@ public class UserStoreOrderServiceImpl implements UserStoreOrderService {
         StoreOrder order = storeOrderRepository.findById(orderId)
             .orElseThrow(() -> new IllegalArgumentException("StoreOrderServiceImpl - updateStoreOrder - OrderId " + orderId + "가 존재하지 않습니다."));
 
-        dto.getOrderStatus();
-        StoreOrderDTO newOrder = storeOrderConverter.toDto(order);
-        return newOrder;
+        // 상태 변경 등 비즈니스 로직 필요 시 여기에 구현
+        // 예: order.changeStatus(dto.getOrderStatus());
+        
+        return storeOrderConverter.toDto(order);
     }
-
-
 
     // =====================================================================
     // DELETE
@@ -114,18 +189,12 @@ public class UserStoreOrderServiceImpl implements UserStoreOrderService {
     @Override
     public StoreOrder getValidatedOrder(Long storeOrderId) {
         if (!storeOrderRepository.existsById(storeOrderId)) {
-            log.error("StoreOrderService - getValidatedOrder - 주문 없음: orderId={}", 
+            log.error("UserStoreOrderService - getValidatedOrder - 주문 없음: orderId={}", 
                 storeOrderId);
-            throw new IllegalArgumentException("주문이 존재하지 않습니다: " + storeOrderId);
+            throw new IllegalArgumentException("UserStoreOrderService - getValidatedOrder - 주문이 존재하지 않습니다: " + storeOrderId);
         }
-        StoreOrder result = storeOrderRepository.findByOrderId(storeOrderId).orElse(null);
-        if (result == null) {
-            log.error("StoreOrderService - getValidatedOrder - 주문 없음: orderId={}", 
-                storeOrderId);
-            throw new IllegalArgumentException("주문이 존재하지 않습니다: " + storeOrderId);
-        }
-        
-        return result;
+        return storeOrderRepository.findByOrderId(storeOrderId)
+                .orElseThrow(() -> new IllegalArgumentException("UserStoreOrderService - getValidatedOrder - 주문이 존재하지 않습니다: " + storeOrderId));
     }
 
     @Override

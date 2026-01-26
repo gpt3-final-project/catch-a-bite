@@ -19,6 +19,7 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
 	private final StoreRepository storeRepository;
 	private final MenuCategoryRepository menuCategoryRepository;
 
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<MenuCategoryDTO> getMenuCategories(Long storeOwnerId, Long storeId) {

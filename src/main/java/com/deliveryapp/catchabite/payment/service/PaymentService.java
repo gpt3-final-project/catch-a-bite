@@ -5,7 +5,6 @@ import com.deliveryapp.catchabite.common.exception.PaymentException;
 import com.deliveryapp.catchabite.entity.AppUser;
 import com.deliveryapp.catchabite.entity.Payment;
 import com.deliveryapp.catchabite.entity.StoreOrder;
-import com.deliveryapp.catchabite.repository.AppUserRepository;
 import com.deliveryapp.catchabite.repository.StoreOrderRepository;
 import com.deliveryapp.catchabite.payment.converter.PaymentDTOConverter;
 import com.deliveryapp.catchabite.payment.dto.PortOnePaymentRequestDTO;
@@ -14,8 +13,6 @@ import com.deliveryapp.catchabite.payment.repository.PaymentRepository;
 
 import lombok.extern.log4j.Log4j2;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +47,6 @@ public class PaymentService {
     private final StoreOrderRepository storeOrderRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentDTOConverter paymentDTOConverter;
-    private final AppUserRepository appUserRepository;
 
     @Value("${portone.store-id}")
     private String portoneImpKey;
@@ -65,16 +61,13 @@ public class PaymentService {
      * @param paymentRepository 결제 저장용 Repository
      * @param paymentDTOConverter DTO 변환기
      */
-    @Autowired
     public PaymentService(
             StoreOrderRepository storeOrderRepository,
             PaymentRepository paymentRepository,
-            PaymentDTOConverter paymentDTOConverter, 
-            AppUserRepository appUserRepository) {
+            PaymentDTOConverter paymentDTOConverter) {
         this.storeOrderRepository = storeOrderRepository;
         this.paymentRepository = paymentRepository;
         this.paymentDTOConverter = paymentDTOConverter;
-        this.appUserRepository = appUserRepository;
     }
     
     /**
