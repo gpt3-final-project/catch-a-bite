@@ -2,7 +2,6 @@ package com.deliveryapp.catchabite.converter;
 
 import com.deliveryapp.catchabite.dto.StoreDTO;
 import com.deliveryapp.catchabite.dto.UserStoreSummaryDTO;
-import com.deliveryapp.catchabite.dto.UserStoreSummaryDTO;
 import com.deliveryapp.catchabite.entity.Store;
 import com.deliveryapp.catchabite.entity.StoreImage;
 
@@ -22,7 +21,7 @@ public class StoreConverter {
                 .storeName(store.getStoreName())
                 .storePhone(store.getStorePhone())
                 .storeAddress(store.getStoreAddress())
-                .storeCategory(store.getStoreCategory())
+                .storeCategory(store.getStoreCategory().name())
                 .storeMinOrder(store.getStoreMinOrder())
                 .storeMaxDist(store.getStoreMaxDist())
                 .storeDeliveryFee(store.getStoreDeliveryFee())
