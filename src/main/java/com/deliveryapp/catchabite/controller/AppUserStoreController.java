@@ -2,7 +2,6 @@
 package com.deliveryapp.catchabite.controller;
 
 import com.deliveryapp.catchabite.dto.MenuCategoryWithMenusDTO;
-import com.deliveryapp.catchabite.dto.StoreDTO;
 import com.deliveryapp.catchabite.dto.UserStoreSummaryDTO;
 import com.deliveryapp.catchabite.dto.UserStoreResponseDTO;
 import com.deliveryapp.catchabite.service.UserStoreService;

@@ -21,12 +21,11 @@ public class AppUserFavoriteController {
     private final FavoriteStoreService favoriteStoreService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<UserFavoriteStoreResponseDTO>>> getMyFavorites(
-            @AuthenticationPrincipal Object principal
-    ) {
+    public ResponseEntity<ApiResponse<List<UserFavoriteStoreResponseDTO>>> getMyFavorites(@AuthenticationPrincipal Object principal) {
         String loginKey = resolveLoginKey(principal);
         if (loginKey == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.fail("UNAUTHORIZED", "로그인이 필요합니다."));
         }
         
         List<UserFavoriteStoreResponseDTO> favorites = favoriteStoreService.getMyFavoriteStores(loginKey);
@@ -41,7 +40,7 @@ public class AppUserFavoriteController {
         String loginKey = resolveLoginKey(principal);
         if (loginKey == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.fail("UNAUTHORIZED", null));
+                    .body(ApiResponse.fail("UNAUTHORIZED", "로그인이 필요합니다."));
         }
 
         FavoriteStoreDTO created = favoriteStoreService.addFavorite(dto.getStoreId(), loginKey);
